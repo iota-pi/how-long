@@ -1,5 +1,5 @@
 module.exports = {
-  entry: ['./build/lambda/index.js'],
+  entry: ['./build/index.js'],
   target: 'node',
   mode: 'production',
   externals: ['aws-sdk'],

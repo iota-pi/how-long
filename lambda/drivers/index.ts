@@ -1,6 +1,4 @@
-import BaseDriver from './base';
 import DynamoDriver from './dynamo';
-
 
 const BACKENDS = {
   dynamo: new DynamoDriver(),

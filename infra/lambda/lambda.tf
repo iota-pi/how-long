@@ -78,7 +78,7 @@ resource "aws_iam_policy" "lambda_policy" {
           "dynamodb:CreateTable"
       ],
       "Resource": [
-        "arn:aws:dynamodb:*:*:table/${aws_dynamodb_table.cache_table.name}",
+        "arn:aws:dynamodb:*:*:table/${aws_dynamodb_table.cache_table.name}"
       ]
     }
   ]

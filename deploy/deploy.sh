@@ -29,8 +29,6 @@ export FORCE_UPDATE
 
 GREEN="\033[0;32m"
 NC="\033[0m"
-stage "Running tests"
-./run-all-tests.sh
 
 stage "Setting workspace"
 current_workspace="$(./tf.sh workspace show)"
@@ -45,7 +43,7 @@ else
 fi
 
 stage "Building Lambdas"
-./deploy-lambdas.sh
+./deploy-lambda.sh
 
 stage "Building App"
 ./deploy-app.sh

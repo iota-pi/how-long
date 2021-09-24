@@ -1,40 +1,47 @@
-import { Toolbar } from '@material-ui/core';
-import makeStyles from '@material-ui/styles/makeStyles';
+import { Button, Container, Stack, styled, TextField, Toolbar } from '@material-ui/core';
+import axios from 'axios';
+import { ChangeEvent, useCallback, useState } from 'react';
 import AppBar from './components/layout/AppBar';
+import { API_BASE_URI } from './utils';
 
-
-const useStyles = makeStyles(theme => ({
-  root: {
-    display: 'flex',
-    height: '100vh',
-  },
-  section: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
-  },
-  paddingTop: {
-    paddingTop: theme.spacing(2),
-  },
-  content: {
-    flexGrow: 1,
-    display: 'flex',
-    flexDirection: 'column',
-  },
-}));
-
+const Root = styled(Container)({
+  height: '100vh',
+});
 
 export default function App() {
-  const classes = useStyles();
+  const [reference, setReference] = useState('');
+
+  const handleChangeReference = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => setReference(event.target.value),
+    [],
+  );
+  const handleClickCheck = useCallback(
+    async () => {
+      const referenceURI = encodeURIComponent(reference);
+      const result = await axios.get(`${API_BASE_URI}/passage/${referenceURI}`);
+      console.warn(result.data);
+    },
+    [reference],
+  );
 
   return (
-    <div className={classes.root}>
+    <Root maxWidth="md">
       <AppBar />
+      <Toolbar />
 
-      <div className={classes.content}>
-        <Toolbar />
+      <Stack p={2} spacing={2}>
+        <TextField
+          label="Reference"
+          onChange={handleChangeReference}
+          value={reference}
+        />
 
-        Hello
-      </div>
-    </div>
+        <Button
+          onClick={handleClickCheck}
+        >
+          Check
+        </Button>
+      </Stack>
+    </Root>
   );
 }

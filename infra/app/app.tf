@@ -5,9 +5,9 @@ locals {
   compress    = true
   origin_id   = "app_s3_origin"
 
-  min_ttl     = var.environment == "production" ? 600 : 0
-  default_ttl = var.environment == "production" ? 600 : 0
-  max_ttl     = 600
+  min_ttl     = var.environment == "production" ? 0 : 0
+  default_ttl = var.environment == "production" ? 0 : 0
+  max_ttl     = 0
 
   allowed_methods = ["GET", "HEAD", "OPTIONS"]
   cached_methods  = ["GET", "HEAD"]

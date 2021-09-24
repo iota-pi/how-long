@@ -10,6 +10,7 @@
     "@types/node": "^15.0.1",
     "aws-lambda-fastify": "^1.7.0",
     "aws-sdk": "^2.892.0",
+    "axios": "^0.21.4",
     "fastify": "^3.15.0",
     "fastify-cookie": "^5.3.0",
     "fastify-cors": "^6.0.0",

@@ -1,4 +1,4 @@
-import AWS, { AWSError } from 'aws-sdk';
+import AWS from 'aws-sdk';
 
 export const CACHE_TABLE_NAME = process.env.CACHE_TABLE || 'HowLongCache';
 

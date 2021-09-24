@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  dynamodb:
+    image: amazon/dynamodb-local
+    command: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-dbPath", "."]
+    ports:
+      - 8000:8000
+    volumes:
+      - dynamodata:/home/dynamodblocal
+
+  api:
+    image: lambda-api
+    build:
+      context: .
+      dockerfile: lambda/api/Dockerfile
+    command: yarn dev
+    depends_on:
+      - dynamodb
+    environment:
+      - DYNAMODB_ENDPOINT=http://dynamodb:8000
+    ports:
+      - 4000:4000
+    volumes:
+      - .:/how-long
+
+  terraform:
+    image: hashicorp/terraform:1.0.1
+    environment:
+      - CLOUDFLARE_ACCOUNT_ID
+      - CLOUDFLARE_API_TOKEN
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - TF_IN_AUTOMATION
+      - TF_VAR_lambda_version
+    volumes:
+      - .:/how-long
+    working_dir: /how-long/infra
+
+volumes:
+  dynamodata:

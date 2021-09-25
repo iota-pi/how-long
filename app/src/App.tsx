@@ -218,7 +218,7 @@ export default function App() {
               color="primary"
               fontWeight={300}
               textAlign="center"
-              variant="h2"
+              variant={lowSeconds === highSeconds ? 'h1' : 'h2'}
             >
               {lowSeconds === highSeconds ? (
                 secondsToMinutes(lowSeconds)

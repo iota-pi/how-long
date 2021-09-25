@@ -1,7 +1,9 @@
 import {
+  Alert,
   Box,
   Container,
   MenuItem,
+  Snackbar,
   Stack,
   styled,
   TextField,
@@ -34,6 +36,7 @@ function secondsToMinutes(seconds: number) {
 }
 
 export default function App() {
+  const [requestError, setRequestError] = useState({ message: '', show: false });
   const [loading, setLoading] = useState(false);
   const [reference, setReference] = useState('');
   const [speedPreset, setSpeedPreset] = useState(speedPresets[1].speed);
@@ -53,6 +56,11 @@ export default function App() {
         if (result.data.success) {
           setWords(result.data.words);
         }
+      } catch (error) {
+        setRequestError({
+          message: 'Something went wrong. Please check the passage reference or try again later.',
+          show: true,
+        });
       } finally {
         setLoading(false);
       }
@@ -69,7 +77,29 @@ export default function App() {
     },
     [],
   );
+  const handleCloseSnackbar = useCallback(
+    () => setRequestError(error => ({ ...error, show: false })),
+    [],
+  );
+  const handleExitedSnackbar = useCallback(
+    () => setRequestError({ message: '', show: false }),
+    [],
+  );
 
+  const validPassage = useMemo(
+    () => {
+      if (!reference) return true;
+
+      const regex = new RegExp([
+        '^',
+        '([0-9]?[a-zA-Z ]*[a-zA-Z]\\.?) ?',
+        '([0-9]+(?: ?\\: ?[0-9]+)?(?: ?- ?(?:[0-9]+(?: ?\\: ?[0-9]+)?))?)?',
+        '$',
+      ].join(''));
+      return regex.test(reference);
+    },
+    [reference],
+  );
   const customSpeedError = useMemo(
     () => {
       if (!/^\d+(–\d+)?$/.test(speedCustom)) {
@@ -124,6 +154,8 @@ export default function App() {
       <Stack p={2} spacing={2}>
         <TextField
           autoFocus
+          error={!validPassage}
+          helperText={validPassage ? undefined : 'Please enter a valid passage reference'}
           label="Reference"
           onChange={handleChangeReference}
           value={reference}
@@ -165,6 +197,7 @@ export default function App() {
         </Stack>
 
         <LoadingButton
+          disabled={!reference || !validPassage}
           loading={loading}
           onClick={handleClickCheck}
           size="large"
@@ -204,6 +237,20 @@ export default function App() {
           </Box>
         )}
       </Stack>
+
+      <Snackbar
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        TransitionProps={{
+          onExited: handleExitedSnackbar,
+        }}
+        open={requestError.show}
+      >
+        <Alert onClose={handleCloseSnackbar} severity="error">
+          {requestError.message}
+        </Alert>
+      </Snackbar>
     </Root>
   );
 }

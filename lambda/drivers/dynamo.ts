@@ -8,7 +8,7 @@ export interface DynamoOptions extends AWS.DynamoDB.ClientConfiguration {}
 
 export interface CacheItem {
   reference: string,
-  data: string,
+  words: number,
 }
 
 export default class DynamoDriver<T = DynamoOptions> {
@@ -53,13 +53,10 @@ export default class DynamoDriver<T = DynamoOptions> {
   }
 
   async set(item: CacheItem) {
-    if (!item.reference || !item.data) {
+    if (!item.reference || !item.words) {
       throw new Error(
-        `Reference ("${item.reference}") and data ("${item.data}") cannot be blank`,
+        `Reference ("${item.reference}") and words ("${item.words}") cannot be blank`,
       );
-    }
-    if (item.data.length > MAX_ITEM_SIZE) {
-      throw new Error(`Item length (${item.data.length}) exceeds maximum (${MAX_ITEM_SIZE})`);
     }
 
     await this.client?.put(

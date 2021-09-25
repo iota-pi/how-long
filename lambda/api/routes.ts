@@ -2,11 +2,15 @@ import axios, { AxiosError } from 'axios';
 import { FastifyPluginCallback } from 'fastify';
 import secrets from '../.secrets';
 import { getPassageId } from './books';
+import getDriver from '../drivers';
+
+const FUMS_DEVICE_ID = Math.random();
 
 const api = axios.create({
   baseURL: 'https://api.scripture.api.bible/v1',
   headers: { 'api-key': secrets.bibleAPIKey },
 });
+const driver = getDriver('dynamo');
 
 interface Bible {
   name: string,
@@ -39,13 +43,21 @@ const routes: FastifyPluginCallback = (fastify, opts, next) => {
 
   fastify.get('/passage/:passage', async (request, reply) => {
     const passage = (request.params as { passage: string }).passage;
-    if (passage.length > 100) {
+    const passageId = getPassageId(passage);
+    if (!passageId) {
       reply.code(400);
-      return { success: false };
+      return { success: false, message: 'Could not parse passage reference' };
+    }
+    const cachedResult = await driver.get(passageId).catch();
+    if (cachedResult) {
+      return {
+        fromCache: true,
+        passage: passageId,
+        success: true,
+        words: cachedResult?.words,
+      };
     }
     try {
-      const passageId = getPassageId(passage);
-      console.log(passageId);
       const uri = getURI(
         `/bibles/${DEFAULT_BIBLE.id}/passages/${passageId}`,
         {
@@ -57,7 +69,21 @@ const routes: FastifyPluginCallback = (fastify, opts, next) => {
       const result = await api.get(uri);
       const content = result.data.data.content.trim();
       const words = content.split(/\s+/).length;
-      return { success: true, words };
+      if (words) {
+        const token = result.data.meta.fumsToken;
+        const promises = [
+          driver.set({ reference: passageId, words }).catch(console.error),
+          axios.get(
+            `https://fums.api.bible/f3?t=${token}&dId=${FUMS_DEVICE_ID}&sId=${FUMS_DEVICE_ID}`,
+          ).catch(console.error),
+        ];
+        await Promise.all(promises);
+      }
+      return {
+        passage: passageId,
+        success: true,
+        words,
+      };
     } catch (error) {
       fastify.log.error({
         code: (error as AxiosError).code,

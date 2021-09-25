@@ -473,19 +473,20 @@ const bookMap = Object.fromEntries(
 );
 
 export function getBookId(rawName: string) {
-  let bestScore = -1;
+  let bestScore = 70;
   let best: string | null = null;
   const name = rawName.replace(/[^a-z0-9 ]/i, '').toLowerCase();
   for (const book of books) {
     const normalisedName = book.name.toLowerCase();
     const normalisedAbbrev = book.abbreviation.replace(/\.$/, '').toLowerCase();
     const score = Math.max(
-      fuzz.ratio(name, normalisedName, { full_process: false }),
+      fuzz.partial_ratio(
+        name,
+        normalisedName.padEnd(name.length + 1, ' '),
+        { full_process: false },
+      ),
       fuzz.ratio(name, normalisedAbbrev, { full_process: false }),
     );
-    if (normalisedName.includes('j')) {
-      console.log(name, normalisedName, normalisedAbbrev, score);
-    }
     if (score > bestScore) {
       bestScore = score;
       best = book.id;
@@ -504,7 +505,7 @@ export function getPassageId(passage: string) {
       .trim()
   );
   const bookId = getBookId(book);
-  if (!reference) {
+  if (!reference || !bookId) {
     return bookId;
   }
   const referenceParts = reference.split('-');

@@ -21,6 +21,9 @@ const speedPresets = [
   { speed: '115–125', name: 'Slow' },
   { speed: '125–135', name: 'Normal' },
   { speed: '130–150', name: 'Fast' },
+  { speed: '150–200', name: 'Internal Slow' },
+  { speed: '250', name: 'Internal Normal' },
+  { speed: '300–400', name: 'Internal Fast' },
   { speed: 'custom', name: 'Custom' },
 ];
 

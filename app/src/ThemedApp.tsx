@@ -2,7 +2,7 @@ import {
   CssBaseline,
   ThemeProvider,
   StyledEngineProvider,
-} from '@material-ui/core';
+} from '@mui/material';
 import App from './App';
 import theme from './theme';
 

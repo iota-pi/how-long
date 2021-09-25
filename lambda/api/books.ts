@@ -1,6 +1,7 @@
-// axios.get(`/bibles/${bible.id}/books`)
+import fuzz from 'fuzzball';
 
-const bookList = [
+// axios.get(`/bibles/${bible.id}/books`)
+const books = [
   {
     "id": "GEN",
     "bibleId": "06125adad2d5898a-01",
@@ -465,14 +466,60 @@ const bookList = [
   }
 ];
 
-export function normaliseBookName(name: string) {
-  return name.toLowerCase().replace(/s$/, '');
-}
-
 const bookMap = Object.fromEntries(
-  bookList.map(
-    book => [normaliseBookName(book.name), book.id],
+  books.map(
+    book => [book.name.toLowerCase(), book.id],
   ),
 );
+
+export function getBookId(rawName: string) {
+  let bestScore = -1;
+  let best: string | null = null;
+  const name = rawName.replace(/[^a-z0-9 ]/i, '').toLowerCase();
+  for (const book of books) {
+    const normalisedName = book.name.toLowerCase();
+    const normalisedAbbrev = book.abbreviation.replace(/\.$/, '').toLowerCase();
+    const score = Math.max(
+      fuzz.ratio(name, normalisedName, { full_process: false }),
+      fuzz.ratio(name, normalisedAbbrev, { full_process: false }),
+    );
+    if (normalisedName.includes('j')) {
+      console.log(name, normalisedName, normalisedAbbrev, score);
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      best = book.id;
+    }
+  }
+  return best;
+}
+
+export function getPassageId(passage: string) {
+  const book = passage.replace(/[\d\s-–]*$/, '');
+  const reference = (
+    passage
+      .replace(/^\d*(\s*[a-z]+)+\s*/i, '')
+      .replace(/\s*[-–]\s*/g, '-')
+      .replace(/:/g, '.')
+      .trim()
+  );
+  const bookId = getBookId(book);
+  if (!reference) {
+    return bookId;
+  }
+  const referenceParts = reference.split('-');
+  const hasVerseNumbers = reference.includes('.');
+  const firstChapter = referenceParts[0].replace(/\..*/, '');
+  const withBookAndChapter = referenceParts.map((part, index) => {
+    if (part.includes('.') || !hasVerseNumbers) {
+      return `${bookId}.${part}`;
+    }
+    if (index === 0) {
+      return `${bookId}.${part}.1`;
+    }
+    return `${bookId}.${firstChapter}.${part}`;
+  });
+  return withBookAndChapter.join('-');
+}
 
 export default bookMap;

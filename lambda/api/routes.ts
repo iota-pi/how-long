@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { FastifyPluginCallback } from 'fastify';
 import secrets from '../.secrets';
-import books, { normaliseBookName } from './books';
+import { getPassageId } from './books';
 
 const api = axios.create({
   baseURL: 'https://api.scripture.api.bible/v1',
@@ -44,13 +44,8 @@ const routes: FastifyPluginCallback = (fastify, opts, next) => {
       return { success: false };
     }
     try {
-      const [book, reference = ''] = passage.split(' ', 2);
-      const bookId = books[normaliseBookName(book)];
-      const passageId = (
-        reference
-          ? reference.replace(/:/g, '.').split('-').map(part => `${bookId}.${part}`).join('-')
-          : bookId
-      );
+      const passageId = getPassageId(passage);
+      console.log(passageId);
       const uri = getURI(
         `/bibles/${DEFAULT_BIBLE.id}/passages/${passageId}`,
         {

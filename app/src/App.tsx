@@ -232,7 +232,7 @@ export default function App() {
               fontWeight={300}
               textAlign="center"
             >
-              (~{words} word{words === 1 ? '' : 's'})
+              (~{Math.round(words / 10) * 10} words)
             </Typography>
           </Box>
         )}

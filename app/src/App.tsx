@@ -20,19 +20,25 @@ const Root = styled(Container)({
 });
 
 const speedPresets = [
-  { speed: '115–130', name: 'Slow' },
-  { speed: '130–140', name: 'Normal' },
-  { speed: '140–160', name: 'Fast' },
+  { speed: '130–150', name: 'Slow' },
+  { speed: '145–160', name: 'Normal' },
+  { speed: '160–180', name: 'Fast' },
   { speed: '150–200', name: 'Internal Slow' },
   { speed: '250', name: 'Internal Normal' },
   { speed: '300–400', name: 'Internal Fast' },
   { speed: 'custom', name: 'Custom' },
 ];
 
-function secondsToMinutes(seconds: number) {
+function secondsToDisplayTime(seconds: number) {
   const minutes = Math.floor(seconds / 60);
-  const remainder = seconds - minutes * 60;
-  return `${minutes}:${remainder.toString().padStart(2, '0')}`;
+  const remainderSeconds = (seconds - minutes * 60).toString().padStart(2, '0');
+  const hours = Math.floor(minutes / 60);
+  const remainderMinutes = (minutes - hours * 60).toString().padStart(2, '0');
+  return [
+    hours,
+    remainderMinutes,
+    remainderSeconds,
+  ].filter(x => x !== 0).join(':');
 }
 
 export default function App() {
@@ -221,9 +227,9 @@ export default function App() {
               variant={lowSeconds === highSeconds ? 'h1' : 'h2'}
             >
               {lowSeconds === highSeconds ? (
-                secondsToMinutes(lowSeconds)
+                secondsToDisplayTime(lowSeconds)
               ) : (
-                `${secondsToMinutes(lowSeconds)}–${secondsToMinutes(highSeconds)}`
+                `${secondsToDisplayTime(lowSeconds)}–${secondsToDisplayTime(highSeconds)}`
               )}
             </Typography>
 

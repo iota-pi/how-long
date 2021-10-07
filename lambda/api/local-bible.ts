@@ -72,6 +72,9 @@ export function parsePassage(passage: string): ParsedReference | null {
       } else {
         endChapter = parseInt(endParts[0]);
       }
+    } else {
+      endChapter = startChapter;
+      endVerse = startVerse;
     }
   }
 

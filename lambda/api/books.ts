@@ -496,12 +496,12 @@ export function getBookId(rawName: string) {
 }
 
 export function getPassageId(passage: string) {
-  const book = passage.replace(/[\d\s-–]*$/, '');
+  const book = passage.replace(/[\d\s-–:;,.]*$/, '');
   const reference = (
     passage
       .replace(/^\d*(\s*[a-z]+)+\s*/i, '')
       .replace(/\s*[-–]\s*/g, '-')
-      .replace(/:/g, '.')
+      .replace(/[:;,]/g, '.')
       .trim()
   );
   const bookId = getBookId(book);

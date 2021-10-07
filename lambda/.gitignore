@@ -1,6 +1,7 @@
 .DS_Store
 node_modules
 /build
+bible.json
 
 # Log files
 npm-debug.log*

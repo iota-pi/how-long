@@ -60,12 +60,12 @@ export function parsePassage(passage: string): ParsedReference | null {
     const referenceParts = reference.split('-');
     const startParts = referenceParts[0].split(':');
     startChapter = parseInt(startParts[0]);
-    startVerse = parseInt(startParts[1]);
+    startVerse = parseInt(startParts[1]) || 1;
     if (referenceParts.length > 1) {
       const endParts = referenceParts[1].split(':');
       if (endParts.length === 2) {
         endChapter = parseInt(endParts[0]);
-        endVerse = parseInt(endParts[1]);
+        endVerse = parseInt(endParts[1]) || 1000;
       } else if (hasVerseNumber) {
         endChapter = startChapter;
         endVerse = parseInt(endParts[0]);
@@ -74,7 +74,9 @@ export function parsePassage(passage: string): ParsedReference | null {
       }
     } else {
       endChapter = startChapter;
-      endVerse = startVerse;
+      if (startParts.length === 2) {
+        endVerse = startVerse;
+      }
     }
   }
 

@@ -22,7 +22,7 @@ const Root = styled(Container)({
 const speedPresets = [
   { speed: '115–130', name: 'Slow' },
   { speed: '130–140', name: 'Normal' },
-  { speed: '140–150', name: 'Fast' },
+  { speed: '140–160', name: 'Fast' },
   { speed: '150–200', name: 'Internal Slow' },
   { speed: '250', name: 'Internal Normal' },
   { speed: '300–400', name: 'Internal Fast' },

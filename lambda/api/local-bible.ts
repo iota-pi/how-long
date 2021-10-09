@@ -92,12 +92,17 @@ export function parsePassage(passage: string): ParsedReference | null {
 export function getPassageText(ref: ParsedReference) {
   let text = '';
   const book = bible[ref.book];
-  for (const [chapter, chapterContent] of Object.entries(book)) {
-    if (parseInt(chapter) < ref.startChapter || parseInt(chapter) > ref.endChapter) {
+  for (const [chapterString, chapterContent] of Object.entries(book)) {
+    const chapter = parseInt(chapterString);
+    if (chapter < ref.startChapter || chapter > ref.endChapter) {
       continue;
     }
-    for (const [verse, verseContent] of Object.entries(chapterContent)) {
-      if (parseInt(verse) < ref.startVerse || parseInt(verse) > ref.endVerse) {
+    for (const [verseString, verseContent] of Object.entries(chapterContent)) {
+      const verse = parseInt(verseString);
+      if (chapter === ref.startChapter && verse < ref.startVerse) {
+        continue;
+      }
+      if (chapter === ref.endChapter && verse > ref.endVerse) {
         continue;
       }
       text += `${verseContent} `;

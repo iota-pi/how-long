@@ -1,24 +1,12 @@
 version: '3'
 
 services:
-  dynamodb:
-    image: amazon/dynamodb-local
-    command: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-dbPath", "."]
-    ports:
-      - 8000:8000
-    volumes:
-      - dynamodata:/home/dynamodblocal
-
   api:
     image: lambda-api
     build:
       context: .
       dockerfile: lambda/api/Dockerfile
     command: yarn dev
-    depends_on:
-      - dynamodb
-    environment:
-      - DYNAMODB_ENDPOINT=http://dynamodb:8000
     ports:
       - 4000:4000
     volumes:

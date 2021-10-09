@@ -62,24 +62,6 @@ resource "aws_iam_policy" "lambda_policy" {
         "logs:PutLogEvents"
       ],
       "Resource": ["arn:aws:logs:*:*:*"]
-    },
-    {
-      "Sid": "ReadWriteCreateTable",
-      "Effect": "Allow",
-      "Action": [
-          "dynamodb:BatchGetItem",
-          "dynamodb:GetItem",
-          "dynamodb:Query",
-          "dynamodb:Scan",
-          "dynamodb:BatchWriteItem",
-          "dynamodb:PutItem",
-          "dynamodb:UpdateItem",
-          "dynamodb:DeleteItem",
-          "dynamodb:CreateTable"
-      ],
-      "Resource": [
-        "arn:aws:dynamodb:*:*:table/${aws_dynamodb_table.cache_table.name}"
-      ]
     }
   ]
 }
@@ -95,20 +77,6 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_attach" {
 resource "aws_cloudwatch_log_group" "lambda_logs" {
   name              = "/aws/lambda/${aws_lambda_function.lambda.function_name}"
   retention_in_days = 14
-}
-
-
-resource "aws_dynamodb_table" "cache_table" {
-  name         = "HowLongCache_${var.environment}"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "reference"
-
-  attribute {
-    name = "reference"
-    type = "S"
-  }
-
-  tags = local.standard_tags
 }
 
 

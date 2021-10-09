@@ -1,8 +1,5 @@
 import { FastifyPluginCallback } from 'fastify';
-import getDriver from '../drivers';
 import { countWords, getPassageText, parsePassage } from './local-bible';
-
-const driver = getDriver('dynamo');
 
 const routes: FastifyPluginCallback = (fastify, opts, next) => {
   fastify.get('/', async () => ({ ping: 'pong' }));

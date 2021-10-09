@@ -65,8 +65,16 @@ interface ParsedReference {
   startVerse: number,
 }
 
+const ONE_CHAPTER_BOOKS = [
+  'Obadiah',
+  'Philemon',
+  '2 John',
+  '3 John',
+  'Jude',
+];
+
 export function parsePassage(passage: string): ParsedReference | null {
-  const book = passage.replace(/[\d\s-–:.]*$/, '');
+  const rawBookName = passage.replace(/[\d\s-–:.]*$/, '');
   const reference = (
     passage
       .replace(/^\d*(\s*[a-z]+)+\s*/i, '')
@@ -74,8 +82,8 @@ export function parsePassage(passage: string): ParsedReference | null {
       .replace(/[.]/g, ':')
       .trim()
   );
-  const bookName = normaliseBookName(book);
-  if (!bookName) {
+  const book = normaliseBookName(rawBookName);
+  if (!book) {
     return null;
   }
 
@@ -86,6 +94,7 @@ export function parsePassage(passage: string): ParsedReference | null {
   if (reference) {
     const hasVerseNumber = reference.includes(':');
     const referenceParts = reference.split('-');
+    const oneChapterBook = ONE_CHAPTER_BOOKS.includes(book);
     const startParts = referenceParts[0].split(':');
     startChapter = parseInt(startParts[0]);
     startVerse = parseInt(startParts[1]) || 1;
@@ -106,10 +115,16 @@ export function parsePassage(passage: string): ParsedReference | null {
         endVerse = startVerse;
       }
     }
+    if (oneChapterBook && !hasVerseNumber) {
+      startVerse = startChapter;
+      endVerse = endChapter;
+      startChapter = 1;
+      endChapter = 1;
+    }
   }
 
   return {
-    book: bookName,
+    book: book,
     startChapter,
     startVerse,
     endChapter,

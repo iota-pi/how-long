@@ -19,12 +19,6 @@ resource "aws_lambda_function" "lambda" {
 
   role = aws_iam_role.lambda_role.arn
 
-  environment {
-    variables = {
-      CACHE_TABLE = aws_dynamodb_table.cache_table.name
-    }
-  }
-
   tags = local.standard_tags
 }
 

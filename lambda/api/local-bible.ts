@@ -1,5 +1,6 @@
 import fuzz from 'fuzzball';
 import rawBible from './bible.json';
+import rawAbbreviations from './abbreviations.json';
 
 const bible: {
   [book: string]: {
@@ -9,28 +10,55 @@ const bible: {
   },
 } = rawBible;
 const books = Object.keys(bible);
+const abbreviations: { [book: string]: string[] } = rawAbbreviations;
 
 export function normaliseBookName(rawName: string) {
-  let bestScore = 70;
+  let bestScore = {
+    partial: 70,
+    full: 0,
+  };
   let best: string | null = null;
   const name = rawName.replace(/[^a-z0-9 ]/i, '').toLowerCase();
   for (const book of books) {
     const normalisedName = book.toLowerCase();
-    const score = fuzz.partial_ratio(
-      name,
-      normalisedName.padEnd(name.length + 1, ' '),
-      { full_process: false },
-    );
-    if (score > bestScore) {
+    const score = {
+      partial: fuzz.partial_ratio(
+        name,
+        normalisedName.padEnd(name.length + 1, ' '),
+        { full_process: false },
+      ),
+      full: fuzz.ratio(
+        name,
+        normalisedName,
+        { full_process: false },
+      ),
+    };
+    if (
+      score.partial > bestScore.partial
+      || (score.partial === bestScore.partial && score.full > bestScore.full)
+    ) {
       bestScore = score;
       best = book;
     }
   }
-  return best as keyof typeof bible | null;
+  for (const [book, abbrevs] of Object.entries(abbreviations)) {
+    const score = Math.max(
+      ...abbrevs.map(abbrev => fuzz.ratio(
+        name,
+        abbrev.toLowerCase(),
+        { full_process: false },
+      )),
+    );
+    if (score >= bestScore.partial) {
+      bestScore.partial = score;
+      best = book;
+    }
+  }
+  return best;
 }
 
 interface ParsedReference {
-  book: keyof typeof bible,
+  book: string,
   endChapter: number,
   endVerse: number,
   startChapter: number,

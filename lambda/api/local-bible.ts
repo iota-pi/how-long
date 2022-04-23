@@ -117,13 +117,25 @@ export function parsePassage(passage: string): ParsedReference | null {
   };
 }
 
-export function getPassageText(ref: ParsedReference) {
+export function getPassageText(ref: ParsedReference): [string, ParsedReference] {
   let text = '';
   const book = bible[ref.book];
+  const actualRef: ParsedReference = {
+    book: ref.book,
+    startChapter: 1000,
+    startVerse: 1000,
+    endChapter: 1,
+    endVerse: 1,
+  };
   for (const [chapterString, chapterContent] of Object.entries(book)) {
     const chapter = parseInt(chapterString);
     if (chapter < ref.startChapter || chapter > ref.endChapter) {
       continue;
+    }
+    actualRef.startChapter = Math.min(chapter, actualRef.startChapter);
+    actualRef.endChapter = Math.max(chapter, actualRef.endChapter);
+
+    if (chapter < actualRef.startChapter) {
     }
     for (const [verseString, verseContent] of Object.entries(chapterContent)) {
       const verse = parseInt(verseString);
@@ -133,10 +145,12 @@ export function getPassageText(ref: ParsedReference) {
       if (chapter === ref.endChapter && verse > ref.endVerse) {
         continue;
       }
+      actualRef.startVerse = Math.min(verse, actualRef.startVerse);
+      actualRef.endVerse = Math.max(verse, actualRef.endVerse);
       text += `${verseContent} `;
     }
   }
-  return text;
+  return [text, actualRef];
 }
 
 export function countWords(text: string) {

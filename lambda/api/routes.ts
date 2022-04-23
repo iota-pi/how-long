@@ -12,10 +12,10 @@ const routes: FastifyPluginCallback = (fastify, opts, next) => {
       return { success: false, message: 'Could not parse passage reference' };
     }
     try {
-      const text = getPassageText(ref)
+      const [text, actualRef] = getPassageText(ref)
       const words = countWords(text);
       return {
-        passage: ref,
+        passage: actualRef,
         success: true,
         words,
       };

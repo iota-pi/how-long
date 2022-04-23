@@ -1,6 +1,7 @@
 import fuzz from 'fuzzball';
 import rawBible from './bible.json';
 import rawAbbreviations from './abbreviations.json';
+import { ParsedReference, ONE_CHAPTER_BOOKS } from '../../app/src/utils';
 
 const bible: {
   [book: string]: {
@@ -56,22 +57,6 @@ export function normaliseBookName(rawName: string) {
   }
   return best;
 }
-
-interface ParsedReference {
-  book: string,
-  endChapter: number,
-  endVerse: number,
-  startChapter: number,
-  startVerse: number,
-}
-
-const ONE_CHAPTER_BOOKS = [
-  'Obadiah',
-  'Philemon',
-  '2 John',
-  '3 John',
-  'Jude',
-];
 
 export function parsePassage(passage: string): ParsedReference | null {
   const rawBookName = passage.replace(/[\d\s-–:.]*$/, '');

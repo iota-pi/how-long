@@ -12,8 +12,8 @@ import {
 import { LoadingButton } from '@mui/lab';
 import TimerIcon from '@mui/icons-material/Timer';
 import axios from 'axios';
-import { ChangeEvent, useCallback, useMemo, useState } from 'react';
-import { API_BASE_URI } from './utils';
+import { ChangeEvent, KeyboardEvent, useCallback, useMemo, useState } from 'react';
+import { API_BASE_URI, ParsedReference, prettyPassage } from './utils';
 
 const Root = styled(Container)({
   height: '100vh',
@@ -48,6 +48,13 @@ export default function App() {
   const [speedPreset, setSpeedPreset] = useState(speedPresets[1].speed);
   const [speedCustom, setSpeedCustom] = useState(speedPreset);
   const [words, setWords] = useState<number>();
+  const [parsedPassage, setParsedPassage] = useState<ParsedReference>({
+    book: '',
+    startChapter: 0,
+    startVerse: 0,
+    endChapter: 0,
+    endVerse: 0,
+  });
 
   const handleChangeReference = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => setReference(event.target.value),
@@ -61,6 +68,7 @@ export default function App() {
         const result = await axios.get(`${API_BASE_URI}/passage/${referenceURI}`);
         if (result.data.success) {
           setWords(result.data.words);
+          setParsedPassage(result.data.passage);
         }
       } catch (error) {
         setRequestError({
@@ -123,7 +131,7 @@ export default function App() {
     () => {
       if (words) {
         const speed = speedPreset === 'custom' ? speedCustom : speedPreset;
-        const wordsPerSecond = speed.split(/[–-]/g).map(x => parseInt(x) / 60);
+        const wordsPerSecond = speed.split(/[-–]/g).map(x => parseInt(x) / 60);
         const [lowSpeed, highSpeed = lowSpeed] = wordsPerSecond;
         const low = Math.max(1, Math.floor(words / highSpeed));
         const high = Math.ceil(words / lowSpeed);
@@ -136,6 +144,27 @@ export default function App() {
       return [0, 0];
     },
     [speedCustom, speedPreset, words],
+  );
+  const passageText = useMemo(
+    () => {
+      if (!parsedPassage.book) {
+        return '';
+      }
+
+      return prettyPassage(parsedPassage);
+    },
+    [parsedPassage],
+  );
+
+  const handleKeyPress = useCallback(
+    (event: KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === 'Enter') {
+        if (reference && validPassage) {
+          handleClickEstimate();
+        }
+      }
+    },
+    [handleClickEstimate, reference, validPassage],
   );
 
   return (
@@ -163,6 +192,7 @@ export default function App() {
           error={!validPassage}
           helperText={validPassage ? undefined : 'Please enter a valid passage reference'}
           label="Reference"
+          onKeyPress={handleKeyPress}
           onChange={handleChangeReference}
           value={reference}
         />
@@ -231,6 +261,14 @@ export default function App() {
               ) : (
                 `${secondsToDisplayTime(lowSeconds)}–${secondsToDisplayTime(highSeconds)}`
               )}
+            </Typography>
+
+            <Typography
+              variant="h5"
+              fontWeight={300}
+              textAlign="center"
+            >
+              {passageText} (ESV)
             </Typography>
 
             <Typography

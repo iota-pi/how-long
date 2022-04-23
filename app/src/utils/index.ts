@@ -52,7 +52,6 @@ export function prettyPassage(reference: ParsedReference) {
     }
     start += startVerse.toString();
   }
-  console.warn(start, end);
 
   const result = `${book} ${start}–${end}`.replace(/[ \-–]+$/, '');
   return result;

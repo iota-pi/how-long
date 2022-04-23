@@ -108,7 +108,7 @@ export default function App() {
   );
   const customSpeedError = useMemo(
     () => {
-      if (!/^\d+(–\d+)?$/.test(speedCustom)) {
+      if (!/^\d+([-–]\d+)?$/.test(speedCustom)) {
         return true;
       }
       const [low, high = low] = speedCustom.split(/[–-]/g);

@@ -124,8 +124,8 @@ export function getPassageText(ref: ParsedReference): [string, ParsedReference] 
     book: ref.book,
     startChapter: 1000,
     startVerse: 1000,
-    endChapter: 1,
-    endVerse: 1,
+    endChapter: ref.endChapter < 1000 ? 1 : ref.endChapter,
+    endVerse: ref.endVerse < 1000 ? 1 : ref.endVerse,
   };
   for (const [chapterString, chapterContent] of Object.entries(book)) {
     const chapter = parseInt(chapterString);
@@ -135,8 +135,6 @@ export function getPassageText(ref: ParsedReference): [string, ParsedReference] 
     actualRef.startChapter = Math.min(chapter, actualRef.startChapter);
     actualRef.endChapter = Math.max(chapter, actualRef.endChapter);
 
-    if (chapter < actualRef.startChapter) {
-    }
     for (const [verseString, verseContent] of Object.entries(chapterContent)) {
       const verse = parseInt(verseString);
       if (chapter === ref.startChapter && verse < ref.startVerse) {

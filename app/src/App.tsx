@@ -53,7 +53,7 @@ export default function App() {
     (event: ChangeEvent<HTMLInputElement>) => setReference(event.target.value),
     [],
   );
-  const handleClickCheck = useCallback(
+  const handleClickEstimate = useCallback(
     async () => {
       const referenceURI = encodeURIComponent(reference);
       setLoading(true);
@@ -205,12 +205,12 @@ export default function App() {
         <LoadingButton
           disabled={!reference || !validPassage}
           loading={loading}
-          onClick={handleClickCheck}
+          onClick={handleClickEstimate}
           size="large"
           startIcon={<TimerIcon />}
           variant="contained"
         >
-          Check
+          Estimate
         </LoadingButton>
 
         {words && (

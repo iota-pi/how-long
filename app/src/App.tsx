@@ -20,10 +20,10 @@ const Root = styled(Container)({
 });
 
 const speedPresets = [
-  { speed: '130–150', name: 'Slow' },
-  { speed: '145–160', name: 'Normal' },
-  { speed: '160–180', name: 'Fast' },
-  { speed: '150–200', name: 'Internal Slow' },
+  { speed: '150–170', name: 'Slow' },
+  { speed: '170–185', name: 'Normal' },
+  { speed: '185–200', name: 'Fast' },
+  { speed: '170–200', name: 'Internal Slow' },
   { speed: '250', name: 'Internal Normal' },
   { speed: '300–400', name: 'Internal Fast' },
   { speed: 'custom', name: 'Custom' },
